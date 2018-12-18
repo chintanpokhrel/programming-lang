@@ -52,7 +52,52 @@
                (int (+ (int-num v1) 
                        (int-num v2)))
                (error "MUPL addition applied to non-number")))]
-        ;; CHANGE add more cases here
+        [(int? e) e]
+        [(isaunit? e)
+         (let ([v (eval-under-env (isaunit-e e) env)])
+           (if (aunit? v) (int 1) (int 0)))]
+        [(fun? e) (closure (env e))]
+        [(closure? e) e]
+        [(apair? e)
+         (let ([v1 (eval-under-env (apair-e1 e) env)]
+               [v2 (eval-under-env (apair-e2 e) env)])
+           (apair v1 v2))]
+        [(fst? e)
+         (let ([pr (eval-under-env (fst-e e) env)])
+           (if (apair? pr)
+               (apair-e1 pr)
+               (error "MUPL fst applied to a non-pair")))]
+        [(snd? e)
+         (let ([pr (eval-under-env (snd-e e) env)])
+           (if (apair? pr)
+               (apair-e2 pr)
+               (error "MUPL snd applied to a non-pair")))]
+        [(ifgreater? e)
+         (let ([v1 (eval-under-env (ifgreater-e1 e) env)]
+               [v2 (eval-under-env (ifgreater-e2 e) env)])
+           (if (and (int? v1)
+                    (int? v2))
+               (if (> (int-num v1) (int-num v2))
+                   (eval-under-env (ifgreater-e3 e) env)
+                   (eval-under-env (ifgreater-e4 e) env))
+               (error "MUPL ifgreater applied to non-number")))]
+        [(mlet? e)
+         (letrec ([v1 (eval-under-env (mlet-e e) env)]
+                  [v2 (eval-under-env (mlet-body e) (cons (cons (mlet-var e) v1) env))])
+           v2)]
+        [(call? e)
+         (let ([v1 (eval-under-env (call-funexp e) env)]
+               [v2 (eval-under-env (call-actual e) env)])
+           (if (closure? v1) (letrec ([nm (fun-nameopt (closure-fun v1))]
+                                      [prm (fun-formal (closure-fun v1))]
+                                      [body (fun-body (closure-fun v1))]
+                                      [clenv (closure-env v1)]
+                                      [env (if nm
+                                               (cons (nm v1) (cons (cons prm v2) clenv))
+                                               (cons (cons prm v2) clenv) )]
+                                      )
+                               (eval-under-env body env))                           
+               (error ("MUPL call applied to a non closure"))))]
         [#t (error (format "bad MUPL expression: ~v" e))]))
 
 ;; Do NOT change
