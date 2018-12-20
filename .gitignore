@@ -1,4 +1,6 @@
 *~
 *.swp
 ./*/compiled/*/*/*
+*.dep
+*.zo
 

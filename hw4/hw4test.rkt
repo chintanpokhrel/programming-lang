@@ -38,6 +38,8 @@
    
    ; dan-then-dog test
    (check-equal? (stream-for-n-steps dan-then-dog 1) (list "dan.jpg") "dan-then-dog test")
+
+   (check-equal? (stream-for-n-steps dan-then-dog-another 1) (list "dan.jpg") "dan-then-dog test")
    
    ; stream-add-zero test
    (check-equal? (stream-for-n-steps (stream-add-zero ones) 1) (list (cons 0 1)) "stream-add-zero test")
@@ -45,7 +47,8 @@
    ; cycle-lists test
    (check-equal? (stream-for-n-steps (cycle-lists (list 1 2 3) (list "a" "b")) 3) (list (cons 1 "a") (cons 2 "b") (cons 3 "a")) 
                 "cycle-lists test")
-   
+   (check-equal? (stream-for-n-steps (cycle-lists-another (list 1 2 3) (list "a" "b")) 3) (list (cons 1 "a") (cons 2 "b") (cons 3 "a")) 
+                "cycle-lists test")
    ; vector-assoc test
    (check-equal? (vector-assoc 4 (vector (cons 2 1) (cons 3 1) (cons 4 1) (cons 5 1))) (cons 4 1) "vector-assoc test")
    
